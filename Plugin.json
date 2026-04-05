@@ -9,7 +9,10 @@
     "description": [
       "[JP] 時計に分針を追加します",
       "[EN] Adds a minute hand to the clock",
-      "[CN] 在时钟上添加分钟指针"
+      "[CN] 在时钟上添加分钟指针",
+      "",
+      "[SETTING]",
+      "Elin\\BepInEx\\config\\sk.minutehand.cfg"
     ],
     "tags": [
       "General"

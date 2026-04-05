@@ -1,4 +1,5 @@
 using Elin.Plugin.Generated;
+using Elin.Plugin.Main.Models.Settings;
 using Elin.Plugin.Main.PluginHelpers;
 using UnityEngine.UI;
 
@@ -6,15 +7,54 @@ namespace Elin.Plugin.Main.Models.Impl
 {
     public static class WidgetDateImpl
     {
+        #region define
+
+        // 補間時間（秒）。小さくすると速く追従する
+        private const float SmoothTime = 0.05f;
+
+        #endregion
+
         #region property
 
         private static Image? ImageMinutes { get; set; }
+        private static Vector2? SourceScale { get; set; }
+
+        // 角度補間用状態
+        private static float CurrentHourAngle { get; set; }
+        private static float CurrentMinuteAngle { get; set; }
+        private static float hourVelocity;
+        private static float minuteVelocity;
+
+        #endregion
+
+        #region function
+
+        // 常に current 以下（時計回り）
+        private static float CalculateClockwiseTargetAngle(float currentUnwrappedAngle, float targetWrappedAngle)
+        {
+            var delta = Mathf.Repeat(currentUnwrappedAngle - targetWrappedAngle, 360f); // 0..360
+            return currentUnwrappedAngle - delta;
+        }
 
         #endregion
 
         #region WidgetDate
 
-        public static void OnActivatePostfix(WidgetDate instance)
+        public static void OnActivatePrefix(WidgetDate instance)
+        {
+            ImageMinutes = null;
+            if (SourceScale != null)
+            {
+                var rt = instance.imageHour.rectTransform;
+                rt.sizeDelta = SourceScale.Value;
+            }
+            else
+            {
+                SourceScale = instance.imageHour.rectTransform.sizeDelta;
+            }
+        }
+
+        public static void OnActivatePostfix(WidgetDate instance, GameDate date)
         {
             var imageHour = instance.imageHour;
 
@@ -30,9 +70,7 @@ namespace Elin.Plugin.Main.Models.Impl
                 return;
             }
 
-            // 時針に対する分針
-            // TODO: お尻が伸びるのだっせぇなぁ、原点に合わせて後ろ縮める楽な方法がぱっと思いつかない
-            var scale = (x: 1.3f, y: 0.6f);
+            var minuteScale = (x: 1.3f, y: 0.8f);
 
             // 何でもかんでもコピーしとけば安心の精神
             var srcRt = imageHour.rectTransform;
@@ -40,11 +78,11 @@ namespace Elin.Plugin.Main.Models.Impl
             dstRt.anchorMin = srcRt.anchorMin;
             dstRt.anchorMax = srcRt.anchorMax;
             dstRt.anchoredPosition = srcRt.anchoredPosition;
-            dstRt.sizeDelta = new Vector2(srcRt.sizeDelta.x * scale.x, srcRt.sizeDelta.y * scale.y);
+            dstRt.sizeDelta = new Vector2(srcRt.sizeDelta.x * minuteScale.x, srcRt.sizeDelta.y * minuteScale.y);
             dstRt.pivot = srcRt.pivot;
             dstRt.localRotation = srcRt.localRotation;
             dstRt.localScale = srcRt.localScale;
-            // 全部コピーしとけの心
+
             clonedImage.color = imageHour.color;
             clonedImage.material = imageHour.material;
             clonedImage.raycastTarget = imageHour.raycastTarget;
@@ -52,14 +90,28 @@ namespace Elin.Plugin.Main.Models.Impl
             clonedImage.preserveAspect = imageHour.preserveAspect;
             clonedImage.sprite = imageHour.sprite;
 
-            // 前へ
             clonedGameObject.transform.SetSiblingIndex(imageHour.transform.GetSiblingIndex() + 1);
             clonedGameObject.SetActive(true);
 
             ImageMinutes = clonedImage;
+
+            // 初期化：現在角度をその場の角度に合わせる（急なジャンプを防ぐ）
+            var minuteAngle = -date.min * 6f + 90f;
+            var hour12 = date.hour % 12;
+            var hourWithMinute = hour12 + date.min / 60f;
+            var hourAngle = -hourWithMinute * 30f + 90f;
+
+            CurrentMinuteAngle = minuteAngle;
+            CurrentHourAngle = hourAngle;
+            hourVelocity = 0f;
+            minuteVelocity = 0f;
+
+            // やけくそで時針を太らす
+            var hourScale = (x: 0.8f, y: 1.2f);
+            srcRt.sizeDelta = new Vector2(SourceScale!.Value.x * hourScale.x, SourceScale!.Value.y * hourScale.y);
         }
 
-        public static void _RefreshPostfix(WidgetDate instance, Game game, GameDate date)
+        public static void _RefreshPostfix(WidgetDate instance, Game game, GameDate date, Setting setting)
         {
             // [ELIN:WidgetDate._Refresh]
             // -> if (EMono.game.activeZone == null)
@@ -75,18 +127,33 @@ namespace Elin.Plugin.Main.Models.Impl
 
             if (ImageMinutes == null)
             {
-                // OnActivate の時点で _Refresh が呼び出されるが、
-                // OnActivate は Postfix で実装しているので ImageMinutes はまだ作られていない可能性あり。
-                // 次回更新は 0.1 秒後なので待っとけばいい。
-                // もともと OnActivate は Prefix で実装していたが、リソースコピー処理するので Postfix に変更した。
-                // Unity の仕組み知らんから分からんけど DI コンテナ的なもので依存性注入されてそうだから問題ないと思うけどさ。
                 return;
             }
 
-            var minute = date.min;
-            var angle = -minute * 6f + 90f;
+            // 目標角度(設定に関係なく時針も計算する)
+            var minuteTarget = -date.min * 6f + 90f;
+            var hourTarget = -((date.hour % 12) + date.min / 60f) * 30f + 90f;
 
-            ImageMinutes.rectTransform.localEulerAngles = new Vector3(0f, 0f, angle);
+            if (setting.IsAnimationEnabled)
+            {
+                var minuteTargetUnwrapped = CalculateClockwiseTargetAngle(CurrentMinuteAngle, minuteTarget);
+                var hourTargetUnwrapped = CalculateClockwiseTargetAngle(CurrentHourAngle, hourTarget);
+
+                // SmoothDampAngle は最短経路を取るため使わない
+                CurrentMinuteAngle = Mathf.SmoothDamp(CurrentMinuteAngle, minuteTargetUnwrapped, ref minuteVelocity, SmoothTime, Mathf.Infinity, Time.deltaTime);
+                CurrentHourAngle = Mathf.SmoothDamp(CurrentHourAngle, hourTargetUnwrapped, ref hourVelocity, SmoothTime, Mathf.Infinity, Time.deltaTime);
+            }
+            else
+            {
+                CurrentMinuteAngle = minuteTarget;
+                CurrentHourAngle = hourTarget;
+            }
+
+            ImageMinutes.rectTransform.localEulerAngles = new Vector3(0f, 0f, Mathf.Repeat(CurrentMinuteAngle, 360f));
+            if (setting.IsHourHandFollowingMinutes)
+            {
+                instance.imageHour.transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Repeat(CurrentHourAngle, 360f));
+            }
         }
 
         #endregion
