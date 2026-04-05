@@ -53,6 +53,5 @@ namespace Elin.Plugin.Main
         }
 
         #endregion
-
     }
 }
