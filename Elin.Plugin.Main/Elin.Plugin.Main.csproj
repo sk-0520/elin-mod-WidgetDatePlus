@@ -15,6 +15,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="**\*.ModTemplate.cs">
+			<DependentUpon>$([System.String]::Copy('%(Filename)').Replace('.ModTemplate','')).cs</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 		<AdditionalFiles Include="..\Plugin.json" />
 		<AdditionalFiles Include="..\Localization.json" />
 		<CompilerVisibleProperty Include="ElinPath" />
