@@ -2,11 +2,8 @@ using BepInEx;
 using Elin.Plugin.Generated;
 using Elin.Plugin.Main.PluginHelpers;
 #if DEBUG
-using Elin.Plugin.Main.Samples;
 #endif
 using HarmonyLib;
-using System;
-using System.Reflection;
 
 // Mod 用テンプレート組み込み想定
 
@@ -23,10 +20,6 @@ namespace Elin.Plugin.Main
         /// <param name="harmony"></param>
         private void AwakePlugin(Harmony harmony)
         {
-#if DEBUG
-            // サンプル用パッチ処理のため削除してください
-            PatchSample(harmony);
-#endif
             //NOP
         }
 
@@ -60,24 +53,6 @@ namespace Elin.Plugin.Main
         }
 
         #endregion
-
-
-#if DEBUG
-        void PatchSample(Harmony harmony)
-        {
-            // ネストクラスのフル名（例: Namespace.SourceElement+Row）
-            var nestedType = AccessTools.TypeByName($"{typeof(SourceElement).FullName}+{nameof(SourceElement.Row)}");
-
-            // オリジナルメソッド（シグネチャを正確に指定）
-            var original = AccessTools.Method(nestedType, nameof(SourceElement.Row.GetText), new Type[] { typeof(string), typeof(bool) });
-
-            // Prefix の MethodInfo を取得（このクラス内に static メソッドを用意）
-            var prefix = typeof(SourceElementRowPatch).GetMethod(nameof(SourceElementRowPatch.GetTextPrefix),
-                BindingFlags.Static | BindingFlags.Public);
-
-            harmony.Patch(original, prefix: new HarmonyMethod(prefix));
-        }
-#endif
 
     }
 }
