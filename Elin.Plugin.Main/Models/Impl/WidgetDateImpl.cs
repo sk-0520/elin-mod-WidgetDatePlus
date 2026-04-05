@@ -32,7 +32,7 @@ namespace Elin.Plugin.Main.Models.Impl
 
             // 時針に対する分針
             // TODO: お尻が伸びるのだっせぇなぁ、原点に合わせて後ろ縮める楽な方法がぱっと思いつかない
-            var scale = 1.3f;
+            var scale = (x: 1.3f, y: 0.6f);
 
             // 何でもかんでもコピーしとけば安心の精神
             var srcRt = imageHour.rectTransform;
@@ -40,7 +40,7 @@ namespace Elin.Plugin.Main.Models.Impl
             dstRt.anchorMin = srcRt.anchorMin;
             dstRt.anchorMax = srcRt.anchorMax;
             dstRt.anchoredPosition = srcRt.anchoredPosition;
-            dstRt.sizeDelta = new Vector2(srcRt.sizeDelta.x * scale, srcRt.sizeDelta.y);
+            dstRt.sizeDelta = new Vector2(srcRt.sizeDelta.x * scale.x, srcRt.sizeDelta.y * scale.y);
             dstRt.pivot = srcRt.pivot;
             dstRt.localRotation = srcRt.localRotation;
             dstRt.localScale = srcRt.localScale;
