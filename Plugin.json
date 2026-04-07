@@ -1,18 +1,22 @@
 {
   "$schema": "./dev-items/Plugin.schema.json",
   "package": {
-    "title": "分針/Minute hand/分钟指针",
-    "id": "sk.minutehand",
+    "title": "WidgetDate [*]",
+    "id": "sk.widgetdateplus",
     "author": "sk",
     "loadPriority": 100,
     "elinVersion": "0.23.287",
     "description": [
+      "(今のところ)",
+      "",
       "[JP] 時計に分針を追加します",
       "[EN] Adds a minute hand to the clock",
       "[CN] 在时钟上添加分钟指针",
       "",
       "[SETTING]",
-      "Elin\\BepInEx\\config\\sk.minutehand.cfg"
+      "Elin\\BepInEx\\config\\sk.widgetdateplus.cfg",
+      "",
+      "https://github.com/sk-0520/elin-mod-WidgetDatePlus"
     ],
     "tags": [
       "General"
