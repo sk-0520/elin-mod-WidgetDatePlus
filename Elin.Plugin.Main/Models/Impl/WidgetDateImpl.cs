@@ -65,7 +65,7 @@ namespace Elin.Plugin.Main.Models.Impl
             var clonedImage = clonedGameObject.GetComponent<Image>();
             if (clonedImage == null)
             {
-                ModHelper.LogNotExpected("複製に Image コンポーネントが見つかりません。");
+                ModHelper.LogNotExpected($"not found: {nameof(Image)}");
                 Object.Destroy(clonedGameObject);
                 return;
             }
