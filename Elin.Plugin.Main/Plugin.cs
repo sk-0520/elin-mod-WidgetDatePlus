@@ -1,8 +1,6 @@
 using Elin.Plugin.Main.Models.Settings;
 using HarmonyLib;
 
-// Mod 用テンプレート組み込み想定
-
 namespace Elin.Plugin.Main
 {
     partial class Plugin
@@ -28,6 +26,5 @@ namespace Elin.Plugin.Main
         }
 
         #endregion
-
     }
 }
