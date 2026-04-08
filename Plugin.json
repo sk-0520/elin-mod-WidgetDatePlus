@@ -7,15 +7,14 @@
     "loadPriority": 100,
     "elinVersion": "0.23.287",
     "description": [
-      "(今のところ)",
-      "",
-      "[JP] 時計に分針を追加します",
-      "[EN] Adds a minute hand to the clock",
-      "[CN] 在时钟上添加分钟指针",
+      "[JP] 時計に分針を追加します(今のところ)",
+      "[EN] Adds a minute hand to the clock (for now)",
+      "[CN] 在时钟上添加分钟指针(目前)",
       "",
       "[SETTING]",
       "Elin\\BepInEx\\config\\sk.widgetdateplus.cfg",
       "",
+      "---",
       "https://github.com/sk-0520/elin-mod-WidgetDatePlus"
     ],
     "tags": [
