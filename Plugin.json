@@ -5,7 +5,7 @@
     "id": "sk.widgetdateplus",
     "author": "sk",
     "loadPriority": 100,
-    "elinVersion": "0.23.287",
+    "elinVersion": "0.23.295",
     "description": [
       "[JP] 時計に分針を追加します(今のところ)",
       "[EN] Adds a minute hand to the clock (for now)",
