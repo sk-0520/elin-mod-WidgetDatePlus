@@ -2,7 +2,7 @@ using Elin.Plugin.Main.Models.Impl;
 using Elin.Plugin.Main.Models.Settings;
 using HarmonyLib;
 
-namespace Elin.Plugin.Main.Models.Patches
+namespace Elin.Plugin.Main.Patches
 {
     [HarmonyPatch(typeof(WidgetDate))]
     public static class WidgetDatePatch
