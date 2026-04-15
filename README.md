@@ -1,5 +1,7 @@
 # WidgetDate [\*]
 
+<https://steamcommunity.com/sharedfiles/filedetails/?id=3704651796>
+
 ~~時計に分針を追加！ 以上！！~~
 
 時計のウィジェットを拡張します。
