@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace Elin.Plugin.Main.Models.Impl
 {
+
+
+
     public static class WidgetDateImpl
     {
         #region define
@@ -154,6 +157,12 @@ namespace Elin.Plugin.Main.Models.Impl
             {
                 instance.imageHour.transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Repeat(CurrentHourAngle, 360f));
             }
+
+            if (EventClockFactory.TryCreate(EMono._zone, out var eventClock))
+            {
+                ModHelper.LogDev($"{eventClock!.MinElapsed}/{eventClock.TimeLimit}");
+            }
+
         }
 
         #endregion

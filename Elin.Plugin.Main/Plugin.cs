@@ -1,4 +1,5 @@
 using Elin.Plugin.Main.Models.Settings;
+using System.Linq;
 
 namespace Elin.Plugin.Main
 {
@@ -22,6 +23,17 @@ namespace Elin.Plugin.Main
         {
             //NOP
         }
+
+#if DEBUG
+        public void PHL()
+        {
+            var w = EMono.ui.widgets.list.OfType<WidgetDate>().FirstOrDefault();
+            if (w != null)
+            {
+                w.OnActivate();
+            }
+        }
+#endif
 
         #endregion
     }
